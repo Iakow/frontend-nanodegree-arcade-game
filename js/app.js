@@ -1,34 +1,48 @@
-var allowedEnemyRows = {
+var enemiesYPositions = {
     'top': 60,
     'middle': 145,
     'bottom': 230
 }
 
-var Enemy = function (row, speed) {
+var looseSound = new Audio('js/sound/eralash-konec.mp3');
+var winSound = new Audio('js/sound/win.mp3');
+
+var Enemy = function (row, player) {
     this.sprite = 'images/enemy-bug.png';
-    this.initialX = -80;
-    this.initialY = allowedEnemyRows[row];
-    this.x = this.initialX;
-    this.y = this.initialY;
-    this.speed = speed;
+    this.y = enemiesYPositions[row];
+    this.x = -80;
+    this.player = player;
+    this.speed = null;
+
+    this.setRandomSpeed();
+}
+
+Enemy.prototype.setRandomSpeed = function () {
+    this.speed = Math.random() * 1.2 + 0.5;
 }
 
 Enemy.prototype.reset = function () {
-    this.x = this.initialX;
+    this.x = -80;
+    this.setRandomSpeed();
+}
+
+Enemy.prototype.checkCollision = function () {
+    return (Math.abs(this.player.y - this.y) < 40
+    && Math.abs(this.player.x - this.x) < 80);
 }
 
 Enemy.prototype.update = function (dt) {
     setInterval(() => {
-        if (player.gameIsEnd) return;
+        if (game.isEnd) return;
 
         if (this.x > 500) {
             this.reset();
             return;
         }
 
-        if (Math.abs(player.y - this.y) < 40 && Math.abs(player.x - this.x) < 80) {
-            player.gameIsEnd = true;
-            setTimeout(() => player.reset(), 1000);
+        if (this.checkCollision()) {
+            looseSound.play();
+            game.reset();
             return;
         }
 
@@ -42,21 +56,13 @@ Enemy.prototype.render = function () {
 
 var Player = function () {
     this.sprite = 'images/char-boy.png';
-    this.initialX = 200;
-    this.initialY = 400;
-    this.x = this.initialX;
-    this.y = this.initialY;
-    this.gameIsEnd = false;
+    this.x = 200;
+    this.y = 400;
 }
 
 Player.prototype.reset = function () {
-    this.x = this.initialX;
-    this.y = this.initialY;
-    this.gameIsEnd = false;
-
-    allEnemies.forEach((enemy) => {
-        enemy.reset();
-    })
+    this.x = 200;
+    this.y = 400;
 }
 
 Player.prototype.render = function () {
@@ -68,18 +74,14 @@ Player.prototype.update = function () {
 };
 
 Player.prototype.handleInput = function (key) {
-    if (this.gameIsEnd) return;
+    if (game.isEnd) return;
 
     if (key === 'up' && this.y >= 72) {
         this.y -= 82;
 
         if (this.y < 0) {
-            this.gameIsEnd = true;
-
-            setTimeout(() => {
-                this.reset();
-            }, 1000);
-
+            winSound.play();
+            game.reset();
             return;
         }
     }
@@ -100,14 +102,30 @@ Player.prototype.handleInput = function (key) {
     }
 }
 
-var allEnemies = [
-    new Enemy('top', 1),
-    new Enemy('middle', 1.1),
-    new Enemy('bottom', 0.5)
-];
+var game = {
+    isEnd: false,
+    reset: function () {
+        this.isEnd = true;
+
+        setTimeout(() => {
+            player.reset();
+
+            allEnemies.forEach((enemy) => {
+                enemy.reset();
+            });
+
+            this.isEnd = false;
+        }, 1400)
+    }
+}
 
 var player = new Player();
 
+var allEnemies = [
+    new Enemy('top', player),
+    new Enemy('middle', player),
+    new Enemy('bottom', player)
+];
 
 document.addEventListener('keyup', function (e) {
     var allowedKeys = {
