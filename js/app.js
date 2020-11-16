@@ -4,8 +4,8 @@ var enemiesYPositions = {
     'bottom': 230
 }
 
-var looseSound = new Audio('js/sound/eralash-konec.mp3');
-var winSound = new Audio('js/sound/win.mp3');
+var looseSound = new Audio('sound/eralash-konec.mp3');
+var winSound = new Audio('sound/win.mp3');
 
 var Enemy = function (row, player) {
     this.sprite = 'images/enemy-bug.png';
