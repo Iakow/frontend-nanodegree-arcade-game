@@ -87,19 +87,19 @@ const Controller = function () {
     this.freezeGame = true;
 
     setTimeout(() => {
-      player = new Player(this.getPlayerLocation, this.checkMovePermission);
+      player = new Player(this.checkPlayerLocation, this.checkMovePermission);
 
       allEnemies = [
-        new Enemy('top', this.getEnemyLocation, this.checkMovePermission),
-        new Enemy('middle', this.getEnemyLocation, this.checkMovePermission),
-        new Enemy('bottom', this.getEnemyLocation, this.checkMovePermission)
+        new Enemy('top', this.checkEnemyLocation, this.checkMovePermission),
+        new Enemy('middle', this.checkEnemyLocation, this.checkMovePermission),
+        new Enemy('bottom', this.checkEnemyLocation, this.checkMovePermission)
       ];
 
       this.freezeGame = false;
     }, 1400);
   };
 
-  this.getEnemyLocation = (x, y) => {
+  this.checkEnemyLocation = (x, y) => {
     if (Math.abs(y - this.playerLocation.y) > 12) {
       return;
     } else if (Math.abs(x - this.playerLocation.x) > 80) {
@@ -109,7 +109,7 @@ const Controller = function () {
     }
   };
 
-  this.getPlayerLocation = (x, y) => {
+  this.checkPlayerLocation = (x, y) => {
     if (y < 0) this.playerWin();
 
     this.playerLocation = { x, y };
@@ -129,12 +129,12 @@ const Controller = function () {
 
 const controller = new Controller();
 
-let player = new Player(controller.getPlayerLocation, controller.checkMovePermission);
+let player = new Player(controller.checkPlayerLocation, controller.checkMovePermission);
 
 let allEnemies = [
-  new Enemy('top', controller.getEnemyLocation, controller.checkMovePermission),
-  new Enemy('middle', controller.getEnemyLocation, controller.checkMovePermission),
-  new Enemy('bottom', controller.getEnemyLocation, controller.checkMovePermission)
+  new Enemy('top', controller.checkEnemyLocation, controller.checkMovePermission),
+  new Enemy('middle', controller.checkEnemyLocation, controller.checkMovePermission),
+  new Enemy('bottom', controller.checkEnemyLocation, controller.checkMovePermission)
 ];
 
 document.addEventListener('keyup', function (e) {
